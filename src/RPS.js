@@ -1,28 +1,29 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import './RPS.css';
 
 const scores = {
-  '👊': 1,
+  '✊': 1,
   '✋': 0,
   '✌': -1,
 };
 
 const RPS = () => {
-  const [computer, setComputer] = useState('👊');
-  const [user, setUser] = useState('🤘');
-  const [result, setResult] = useState('');
+  const [computer, setComputer] = useState('✊');
+  const [user, setUser] = useState('💪');
+  const [result, setResult] = useState('vs');
   const [score, setScore] = useState(0);
   const [btnDisabled, setBtnDisabled] = useState(false);
   const interval = useRef(null);
 
-  const changeHand = () => {
-    if (computer === '👊') {
+  const changeHand = useCallback(() => {
+    if (computer === '✊') {
       setComputer('✋');
     } else if (computer === '✋') {
       setComputer('✌');
     } else if (computer === '✌') {
-      setComputer('👊');
+      setComputer('✊');
     }
-  };
+  }, [computer]);
 
   const onClickBtn = (user) => () => {
     setUser(user);
@@ -39,7 +40,7 @@ const RPS = () => {
       setScore((prevScore) => prevScore - 1);
     }
     setTimeout(() => {
-      changeHand();
+      interval.current = setInterval(changeHand, 100);
       setBtnDisabled(false);
     }, 1000);
   };
@@ -49,25 +50,35 @@ const RPS = () => {
     return () => {
       clearInterval(interval.current);
     };
-  }, [computer]);
+  }, [changeHand]);
 
   return (
-    <div>
-      <div>{computer}</div>
-      <div>{result}</div>
-      <div>{user}</div>
-      <div>
-        <button disabled={btnDisabled} onClick={onClickBtn('👊')}>
-          Rock
+    <div className="rps-box">
+      <div className="score">Score: {score}</div>
+      <div className="result-box">
+        <div className="computer">
+          <span>{computer}</span>
+          <h3>Computer</h3>
+        </div>
+        <div className="result">
+          <span>{result}</span>
+        </div>
+        <div className="user">
+          <span>{user}</span>
+          <h3>You</h3>
+        </div>
+      </div>
+      <div className="btn-box">
+        <button disabled={btnDisabled} onClick={onClickBtn('✊')}>
+          ✊
         </button>
         <button disabled={btnDisabled} onClick={onClickBtn('✋')}>
-          Paper
+          ✋
         </button>
         <button disabled={btnDisabled} onClick={onClickBtn('✌')}>
-          Scissors
+          ✌
         </button>
       </div>
-      <div>Score: {score}</div>
     </div>
   );
 };
